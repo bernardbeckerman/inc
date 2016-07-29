@@ -119,10 +119,8 @@ fbi_viol  = ['01A','02','03','04A','04B']
 fbi_nviol = ['01B','05','06','07','08A','08B','09','10','11','12','13','14','15','16','17','18','19','20','22','24','26']
 fbi_prop  = ['05','06','07','09']
 
-print("loading data")
-a = pd.read_csv('Crimes_-_2001_to_present.csv')#,nrows=10)  #load data
-print("loading data complete")
-#code.interact(local=locals())
+#load data
+a = pd.read_csv('Crimes_-_2001_to_present.csv')#,nrows=100000)  #load data
 a[tims] = a[date].apply(getTime)                              #time in seconds
 a[timh] = a[tims].apply(lambda x: int(x/3600.0))              #time in hours
 a[viol] = a[fbi].apply(isViol)                                #is the crime violent?
@@ -138,32 +136,10 @@ n_nviol = n[24:48]          #histogram (hourly) of nonviolent crime
 b_viol  = bins[0:24]        #x-vals corresp. to violent hist.
 b_nviol = bins[24:48]       #x-vals corresp. to nonviolent hist.
 
-gvy = gviol.get_group(True)  #all violent crimes
-gvn = gviol.get_group(False) #nonviolent crimes
+gvy = gviol.get_group(True) #all violent crimes
+gvn = gviol.get_group(False)#nonviolent crimes
 #print (gvy.groupby(timh)['Arrest'].mean())#how likely are arrests for violent crimes?
 #print (gvn.groupby(timh)['Arrest'].mean())#how likely are arrests for nonviolent crimes?
-gvy_yr = gvy.groupby(year)
-print("subhistograms complete")
-for iyr in range (2001,2017):
-    print("processing year " + str(iyr))
-    yrgrp = gvy_yr.get_group(iyr)
-
-    #make list of all times violent crimes committed
-    vdata = yrgrp[tims].apply(lambda x: x*np.pi/3600.0/12.0-np.pi).values.tolist()
-
-    #calculate and write circular kde
-    lx = 400
-    kappa_vm = 50
-    x_data, vonmises_kde, f = vonmises_KDE(vdata, kappa_vm, lx, plot=0)
-    f = open('prd_vm' + str(iyr) + '.dat','w')
-    for i in range(0,lx):
-        xc = (i-lx/4.0)*24.0/(lx/2.0)
-        if i < lx/2:
-            f.write(str(xc)+' '+str(vonmises_kde[i]+vonmises_kde[i+lx/2]) + '\n')
-        else:
-            f.write(str(xc)+' '+str(vonmises_kde[i]+vonmises_kde[i-lx/2]) + '\n')
-    f.close()
-
 
 ###plot hists. of violent and nonviolent crimes
 ##plt.plot(b_viol,n_viol)
@@ -177,6 +153,20 @@ for iyr in range (2001,2017):
 #for i in range(24):
 #    f.write(str(i) + " " + str(n_viol[i]) + " " + str(n_nviol[i]) + '\n')
 
+#make list of all times violent crimes committed
+vdata = gvy[tims].apply(lambda x: x*np.pi/3600.0/12.0-np.pi).values.tolist()
+
+#calculate and write circular kde
+lx = 200
+kappa_vm = 100
+x_data, vonmises_kde, f = vonmises_KDE(vdata, kappa_vm, lx, plot=0)
+f = open('prd_vm.dat','w')
+for i in range(0,lx):
+    xc = (i-50.0)*24.0/100.0
+    if i < lx/2:
+        f.write(str(xc)+' '+str(vonmises_kde[i]+vonmises_kde[i+100]) + '\n')
+    else:
+        f.write(str(xc)+' '+str(vonmises_kde[i]+vonmises_kde[i-100]) + '\n')
 #for i in range(100):
 #    print (x_data[i], vonmises_kde[i])
 

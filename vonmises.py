@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-def vonmises_KDE(data, kappa, plot=None):       
+def vonmises_KDE(data, kappa, length, plot=None):
 
     """    
     Create a kernal densisity estimate of circular data using the von mises 
@@ -18,7 +18,7 @@ def vonmises_KDE(data, kappa, plot=None):
     # set limits for von mises
     vonmises.a = -np.pi
     vonmises.b = np.pi
-    x_data = np.linspace(-2*np.pi, 2*np.pi, 200)
+    x_data = np.linspace(-2*np.pi, 2*np.pi, length, endpoint=False)
 
     kernels = []
 
@@ -27,8 +27,6 @@ def vonmises_KDE(data, kappa, plot=None):
         # Make the basis function as a von mises PDF
         kernel = vonmises(kappa, loc=d)
         kernel = kernel.pdf(x_data)
-        kernels.append(kernel)
-        kernels.append(kernel)
         kernels.append(kernel)
 
         if plot:
@@ -48,21 +46,15 @@ def vonmises_KDE(data, kappa, plot=None):
 
     return x_data, vonmises_kde, f
 
-baz = np.array([-92.29061004, -85.42607874, -85.42607874, -70.01689348,
-               -63.43494882, -63.43494882, -70.01689348, -70.01689348,
-               -59.93141718, -63.43494882, -59.93141718, -63.43494882,
-               -63.43494882, -63.43494882, -57.52880771, -53.61564818,
-               -57.52880771, -63.43494882, -63.43494882, -92.29061004,
-               -16.92751306, -99.09027692, -99.09027692, -16.92751306,
-               -99.09027692, -16.92751306,  -9.86580694,  -8.74616226,
-                -9.86580694,  -8.74616226,  -8.74616226,  -2.20259816,
-                -2.20259816,  -2.20259816,  -9.86580694,  -2.20259816,
-                -2.48955292,  -2.48955292,  -2.48955292,  -2.48955292,
-                 4.96974073,   4.96974073,   4.96974073,   4.96974073,
-                -2.48955292,  -2.48955292,  -2.48955292,  -2.48955292,
-                -2.48955292,  -9.86580694,  -9.86580694,  -9.86580694,
-               -16.92751306, -19.29004622, -19.29004622, -26.56505118,
-               -19.29004622, -19.29004622, -19.29004622, -19.29004622,179,])   
+baz = np.array([179,100,-170])   
 kappa = 12
-x_data, vonmises_kde, f = vonmises_KDE(baz, kappa, plot=1)
+x_data, vonmises_kde, f = vonmises_KDE(baz, kappa, 200, plot=0)
+f = open('prd_vm.dat','w')
+for i in range(0,200):
+    xc = (i-100.0)*np.pi/50.0
+    if xc < 0:
+        f.write(str(xc)+' '+str(vonmises_kde[i]+vonmises_kde[i+100]) + '\n')
+    else:
+        f.write(str(xc)+' '+str(vonmises_kde[i]+vonmises_kde[i-100]) + '\n')
+f.close()
 plt.show()

@@ -1,6 +1,7 @@
-set title "Percent of crimes vs. time committed" font ",12"
+set title "Percent of violent crimes vs. time committed" font ",12"
 set term pdf color solid lw 2
-set output "freq_polar.pdf"
+ystr = "2017"
+set output sprintf("freq_polar_%s.pdf",ystr)
 set encoding iso_8859_1
 set key top left
 set style fill transparent solid 0.5 noborder
@@ -40,6 +41,9 @@ unset raxis
 unset border
 
 plot \
-"violent.dat" using (0.5*pi-$1/12*pi+delta):($2*100) lw 3 lc rgb 'red' ti "Violent", \
-"prd_vm.dat" using (0.5*pi-($1+0.5)/12*pi+delta):($2*100*pi/24.0) lw 3  w lines lc rgb 'red' noti, \
-"violent.dat" using (0.5*pi-$1/12*pi-delta):($3*100) lw 3 lc rgb 'blue' ti "Nonviolent"
+sprintf("prd_vm%s.dat",ystr) using (0.5*pi-($1)/12*pi+delta):($2*100*pi/12.0) w lines lc rgb 'red' ti ystr, \
+
+#plot \
+#"violent.dat" using (0.5*pi-$1/12*pi+delta):($2*100) lw 3 lc rgb 'red' ti "Violent", \
+#"prd_vm.dat" using (0.5*pi-($1)/12*pi+delta):($2*100*pi/12.0) w lines lc rgb 'red' noti, \
+#"violent.dat" using (0.5*pi-$1/12*pi-delta):($3*100) lw 3 lc rgb 'blue' ti "Nonviolent"
